@@ -1,7 +1,6 @@
 (function() {
 
-QUnit.config.testTimeout = 500;
-//QUnit.config.testTimeout = 500 * 100;
+QUnit.config.testTimeout = 1000;
 
 module("Oasis");
 
@@ -793,6 +792,63 @@ suite('iframe', function() {
     });
 
     stop();
+    sandbox.start();
+  });
+
+  test("Sandboxes can open popup windows when allowed", function() {
+    Oasis.register({
+      url: "fixtures/popup.js",
+      capabilities: ['assertions']
+    });
+
+    stop();
+
+    var AssertionsService = Oasis.Service.extend({
+      events: {
+        ok: function(data) {
+          start();
+          equal(data, true,  "The sandboxed iframe can open a popup window");
+        }
+      }
+    });
+
+    createSandbox({
+      url: "fixtures/popup.js",
+      services: {
+        assertions: AssertionsService
+      },
+      sandbox: {
+        popups: true
+      }
+    });
+
+    sandbox.start();
+  });
+
+  test("Sandboxes can not open popup windows when not allowed", function() {
+    Oasis.register({
+      url: "fixtures/popup.js",
+      capabilities: ['assertions']
+    });
+
+    stop();
+
+    var AssertionsService = Oasis.Service.extend({
+      events: {
+        ok: function(data) {
+          start();
+          equal(data, false,  "The sandboxed iframe can not open a popup window");
+        }
+      }
+    });
+
+    createSandbox({
+      url: "fixtures/popup.js",
+      services: {
+        assertions: AssertionsService
+      }
+    });
+
     sandbox.start();
   });
 });

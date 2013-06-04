@@ -114,6 +114,18 @@ Oasis.connect('data').then(function(port) {
 });
 ```
 
+The application can grant specific privileges to the sandbox, like opening windows.
+
+```js
+  var sandbox = Oasis.createSandbox({
+    url: 'http://example.com/profile_viewer.html',
+    capabilities: [ 'account' ],
+    sandbox: {
+      popups: true
+    }
+  });
+```
+
 Oasis aims to streamline the process for communicating with sandboxed
 code. As the web platform's support for sandboxed code continues to mature,
 Oasis will provide a consistent interface that takes advantage of native
