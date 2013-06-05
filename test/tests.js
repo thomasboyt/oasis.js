@@ -851,6 +851,65 @@ suite('iframe', function() {
 
     sandbox.start();
   });
+
+  test("Sandboxes can submit forms when allowed", function() {
+    expect(1);
+    Oasis.register({
+      url: "fixtures/form.js",
+      capabilities: ['assertions']
+    });
+
+    stop();
+
+    var AssertionsService = Oasis.Service.extend({
+      events: {
+        ok: function(data) {
+          start();
+          equal(data, true,  "The sandboxed iframe can open a popup window");
+        }
+      }
+    });
+
+    createSandbox({
+      url: "fixtures/form.js",
+      services: {
+        assertions: AssertionsService
+      },
+      sandbox: {
+        forms: true
+      }
+    });
+
+    sandbox.start();
+  });
+
+  test("Sandboxes can not submit forms when not allowed", function() {
+    expect(1);
+    Oasis.register({
+      url: "fixtures/form.js",
+      capabilities: ['assertions']
+    });
+
+    stop();
+
+    var AssertionsService = Oasis.Service.extend({
+      events: {
+        ok: function(data) {
+          start();
+          equal(data, false,  "The sandboxed iframe can open a popup window");
+        }
+      }
+    });
+
+    createSandbox({
+      url: "fixtures/form.js",
+      services: {
+        assertions: AssertionsService
+      }
+    });
+
+    sandbox.start();
+  });
 });
 
 if (typeof Worker !== 'undefined') {

@@ -114,14 +114,15 @@ Oasis.connect('data').then(function(port) {
 });
 ```
 
-The application can grant specific privileges to the sandbox, like opening windows.
+The application can grant specific privileges to the sandbox, like opening windows or submitting forms.
 
 ```js
   var sandbox = Oasis.createSandbox({
     url: 'http://example.com/profile_viewer.html',
     capabilities: [ 'account' ],
     sandbox: {
-      popups: true
+      popups: true,
+      forms: true
     }
   });
 ```

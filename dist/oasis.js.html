@@ -876,8 +876,13 @@ define("oasis",
             oasisURL = options.oasisURL || 'oasis.js.html';
 
         iframe.sandbox = 'allow-same-origin allow-scripts';
-        if( options && options.sandbox && options.sandbox.popups ) {
-          iframe.sandbox += ' allow-popups';
+        if( options && options.sandbox ) {
+          if( options.sandbox.popups ) {
+            iframe.sandbox += ' allow-popups';
+          }
+          if( options.sandbox.forms ) {
+            iframe.sandbox += ' allow-forms';
+          }
         }
         iframe.seamless = true;
         iframe.src = 'about:blank'
