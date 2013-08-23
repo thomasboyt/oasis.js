@@ -8,10 +8,8 @@ if (typeof define !== 'function' && typeof requireModule !== 'function') {
       registry[name] = { deps: deps, callback: callback };
     };
 
-    requireModule = function(name, sessionId) {
-      var sessionId = sessionId === undefined ? 'global' : sessionId;
-      var key = sessionId.toString() + '|' + name;
-      if (seen[key]) { return seen[key]; }
+    requireModule = function(name) {
+      if (seen[name]) { return seen[name]; }
 
       var mod = registry[name];
 
@@ -28,13 +26,13 @@ if (typeof define !== 'function' && typeof requireModule !== 'function') {
         if (deps[i] === 'exports') {
           reified.push(exports = {});
         } else {
-          reified.push(requireModule(deps[i], sessionId));
+          reified.push(requireModule(deps[i]));
         }
       }
 
       var value = callback.apply(this, reified);
 
-      return seen[key] = exports || value;
+      return seen[name] = exports || value;
     };
 
     define.registry = registry;
