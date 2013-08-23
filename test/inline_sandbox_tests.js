@@ -22,6 +22,9 @@ test("can be created", function() {
   });
 
   ok(sandbox, 'expected sandbox to be created');
+  sandbox.start();
+
+  ok(sandbox.el instanceof HTMLElement, 'has DOM element');
 });
 
 test("communication", function(){
@@ -97,7 +100,6 @@ test("2 sandboxes", function(){
     // the second service requires arguments: 'first', 'second' or it
     // will return undefined;
     var request2 = sandbox2.capabilities.pong.port.request('ping').then(function(data) {
-      debugger;
       start();
       equal(data, 'not-pong', "promise was resolved without data, as it did not provide the correct arugments");
     }, function (reason) {

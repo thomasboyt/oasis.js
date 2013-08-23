@@ -664,8 +664,7 @@ define("oasis/inline_adapter",
       // Environment API
 
       initializeSandbox: function(sandbox) {
-        var oasisURL = this.oasisURL(sandbox);
-
+        sandbox.el = document.createElement('div');
         var channel = new PostMessageMessageChannel();
 
         this.port = channel.port2;
@@ -703,7 +702,7 @@ define("oasis/inline_adapter",
       startSandbox: function(sandbox) { },
 
       terminateSandbox: function(sandbox) {
-        var rootElement = sandbox.rootElement;
+        var el = sandbox.el;
         // cleanup?
       },
       oasisLoaded: function() {
