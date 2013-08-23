@@ -26,7 +26,7 @@ module('iframe Sandboxes', {
 });
 
 test("The iframes are named to improve debugging", function() {
-  Oasis.register({
+  oasis.register({
     url: "fixtures/index.js",
     capabilities: []
   });
@@ -43,7 +43,7 @@ test("The iframes are named to improve debugging", function() {
 test("Oasis' bootloader can be hosted on a separate domain", function() {
   expect(2);
 
-  Oasis.register({
+  oasis.register({
     url: "fixtures/assertions.js",
     capabilities: ['assertions']
   });
@@ -73,7 +73,7 @@ test("Oasis' bootloader can be hosted on a separate domain", function() {
 });
 
 test("returns a sandbox with an iframe element", function() {
-  Oasis.register({
+  oasis.register({
     url: "fixtures/index.js",
     capabilities: []
   });
@@ -102,7 +102,7 @@ test("Sandboxes can post messages to their own nested (non-Oasis) iframes", func
 
   var sandboxUrl = destinationUrl +  "/fixtures/same_origin.js";
 
-  Oasis.register({
+  oasis.register({
     url: sandboxUrl,
     capabilities: ['assertions']
   });
@@ -129,7 +129,7 @@ test("Sandboxes can post messages to their own nested (non-Oasis) iframes", func
 });
 
 test("does not generate exception when not in the DOM", function() {
-  Oasis.register({
+  oasis.register({
     url: "fixtures/index.js",
     capabilities: []
   });

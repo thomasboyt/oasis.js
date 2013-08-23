@@ -34,7 +34,10 @@
     // uncomment for debugging
     //QUnit.config.testTimeout = 60 * 1000;
 
-    requireModule('oasis').logger.enable();
+    var Oasis = new requireModule('oasis'),
+        oasis = new Oasis();
+
+    oasis.logger.enable();
 
     // load all tests
     for (var moduleName in define.registry) {

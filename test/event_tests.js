@@ -5,7 +5,7 @@ commonTests('Events', function (createSandbox) {
   test("service - card can communicate with the environment through a port with the environment shorthand for events", function() {
     expect(1);
 
-    Oasis.register({
+    oasis.register({
       url: "fixtures/assertions.js",
       capabilities: ['assertions']
     });
@@ -32,7 +32,7 @@ commonTests('Events', function (createSandbox) {
   test("service - card can communicate with the environment through a port with the card shorthand for events", function() {
     expect(2);
 
-    Oasis.register({
+    oasis.register({
       url: "fixtures/assertions_shorthand.js",
       capabilities: ['assertions']
     });
@@ -66,7 +66,7 @@ commonTests('Events', function (createSandbox) {
 
   test("When the shorthand form is used for events, they can send events", function() {
     expect(1);
-    Oasis.register({
+    oasis.register({
       url: "fixtures/peter_pong.js",
       capabilities: ['peterpong']
     });
@@ -98,7 +98,7 @@ commonTests('Events', function (createSandbox) {
   });
 
   test("When the shorthand form is used for events, they can send requests", function() {
-    Oasis.register({
+    oasis.register({
       url: "fixtures/peter_pong_request.js",
       capabilities: ['peterpong']
     });

@@ -1,11 +1,11 @@
-import Oasis from "oasis";
+import { Oasis } from "oasis";
 import { commonTests } from "test/helpers/suite";
 
 commonTests('Consumer', function (createSandbox, adapter) {
   test("Consumers instances are saved on the Oasis global", function() {
     stop();
 
-    Oasis.register({
+    oasis.register({
       url: "fixtures/consumer.js",
       capabilities: ['assertions']
     });
@@ -30,7 +30,7 @@ commonTests('Consumer', function (createSandbox, adapter) {
   });
 
   test("Consumers do not process events until connect() has been called", function() {
-    Oasis.register({
+    oasis.register({
       url: 'fixtures/delayed_connect.js',
       capabilities: ['assertions']
     });

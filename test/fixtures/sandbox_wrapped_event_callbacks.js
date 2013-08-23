@@ -6,7 +6,7 @@ Oasis.configure('eventCallback', function (callback) {
   inWrapper = false;
 });
 
-Oasis.connect({
+oasis.connect({
   consumers: {
     wrappedEvents: Oasis.Consumer.extend({
       initialize: function (port) {

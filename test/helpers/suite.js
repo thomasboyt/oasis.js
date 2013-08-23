@@ -1,4 +1,4 @@
-import Oasis from "oasis";
+import globals from "test/helpers/globals";
 import iframeAdapter from "oasis/iframe_adapter";
 import webworkerAdapter from "oasis/webworker_adapter";
 
@@ -14,14 +14,15 @@ function createSandboxFn(currentAdapter) {
       options.oasisURL = destinationUrl + '/oasis.js.html';
     }
 
-    var sandbox = Oasis.createSandbox(options);
+    var sandbox = globals.oasis.createSandbox(options);
     sandboxes.push(sandbox);
     return sandbox;
   };
 }
 
 function setup() {
-  Oasis.reset();
+  globals.oasis = new Oasis();
+  globals.oasis.reset();
 }
 
 function teardown() {

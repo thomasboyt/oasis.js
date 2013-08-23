@@ -1,8 +1,12 @@
 import Oasis from "oasis";
+import RSVP from "rsvp";
 import InlineAdapter from "oasis/inline_adapter";
+
+var oasis;
 
 module('Inline Sandboxes', {
   setup: function() {
+    oasis = new Oasis();
     Oasis.reset();
   }
 });
@@ -12,7 +16,7 @@ test("it exists", function() {
 });
 
 test("can be created", function() {
-  var sandbox = Oasis.createSandbox({
+  var sandbox = oasis.createSandbox({
     url: 'fixtures/simple_value.js',
     adapter: InlineAdapter,
     capabilities: ['assertions'],
@@ -83,13 +87,12 @@ test("2 sandboxes", function(){
   });
 
   stop();
-  var RSVP = requireModule('rsvp');
   RSVP.all([sandbox1.waitForLoad(), sandbox2.waitForLoad()]).then(function (value) {
     start();
     stop();
     stop();
 
-    var request1 = sandbox1.capabilities.pong.port.request('ping').then(function(data) {
+    var request1 = sandbox1.capabilities.pong.request('ping').then(function(data) {
       start();
       equal(data, 'pong', "promise was resolved with expected value");
     }, function (reason) {
@@ -99,7 +102,7 @@ test("2 sandboxes", function(){
 
     // the second service requires arguments: 'first', 'second' or it
     // will return undefined;
-    var request2 = sandbox2.capabilities.pong.port.request('ping').then(function(data) {
+    var request2 = sandbox2.capabilities.pong.request('ping').then(function(data) {
       start();
       equal(data, 'not-pong', "promise was resolved without data, as it did not provide the correct arugments");
     }, function (reason) {
@@ -107,7 +110,7 @@ test("2 sandboxes", function(){
       ok(false, reason);
     });
 
-    var request3 = sandbox2.capabilities.pong.port.request('ping', 'first', 'second').then(function(data) {
+    var request3 = sandbox2.capabilities.pong.request('ping', 'first', 'second').then(function(data) {
       start();
       equal(data, 'pong', "promise was resolved without data, as it did not provide the correct arugments");
     }, function (reason) {

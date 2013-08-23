@@ -16,7 +16,7 @@ function checkForNonExistentPort() {
   }
 }
 
-Oasis.connect('assertions').then(function (port) {
+oasis.connect('assertions').then(function (port) {
   port.send('blackRaven', 'dark words');
 
   setTimeout(winterIsComing, 10);
