@@ -1,6 +1,6 @@
 define("oasis",
-  ["oasis/util","oasis/config","oasis/connect","rsvp","oasis/logger","oasis/version","oasis/state","oasis/sandbox","oasis/sandbox_init","oasis/service","oasis/iframe_adapter","oasis/webworker_adapter","oasis/inline_adapter"],
-  function(__dependency1__, __dependency2__, __dependency3__, RSVP, logger, Version, state, Sandbox, initializeSandbox, Service, iframeAdapter, webworkerAdapter, InlineAdapter) {
+  ["oasis/util","oasis/config","oasis/connect","rsvp","oasis/logger","oasis/version","oasis/sandbox","oasis/sandbox_init","oasis/service","oasis/iframe_adapter","oasis/webworker_adapter","oasis/inline_adapter"],
+  function(__dependency1__, __dependency2__, __dependency3__, RSVP, logger, Version, Sandbox, initializeSandbox, Service, iframeAdapter, webworkerAdapter, InlineAdapter) {
     "use strict";
     var assert = __dependency1__.assert;
     var configuration = __dependency2__.configuration;
@@ -14,7 +14,24 @@ define("oasis",
 
     function Oasis() {
       initializeSandbox();
-      this.reset();
+
+      // Data structures used by Oasis when creating sandboxes
+      this.packages = {};
+      this.requestId = 0;
+      this.oasisId = 'oasis' + (+new Date());
+
+      this.consumers = {};
+      this.services = [];
+
+      // Data structures used when connecting to a parent sandbox
+      this.ports = {};
+      this.handlers = {};
+
+      this.receivedPorts = false;
+
+      // TODO (DH): Can we remove this?
+      configuration.eventCallback = function (callback) { callback(); };
+      configuration.allowSameOrigin = false;
     }
 
     Oasis.Version = Version;
@@ -65,20 +82,11 @@ define("oasis",
       register: function (options) {
         assert(options.capabilities, "You are trying to register a package without any capabilities. Please provide a list of requested capabilities, or an empty array ([]).");
 
-        packages[options.url] = options;
+        this.packages[options.url] = options;
       },
 
       configure: configure,
 
-      // TODO: move all of reset to constructor
-      //        and all of state for that matter
-      reset: function () {
-        state.reset();
-        packages = state.packages;
-        this.consumers = state.consumers;
-      },
-
-      // TODO: move handlers to constructor
       registerHandler: registerHandler,
       connect: connect,
       portFor: portFor,
@@ -86,23 +94,20 @@ define("oasis",
       config: configuration
     };
 
-    var packages = state.packages;
-
 
 
     return Oasis;
   });
 define("oasis/base_adapter",
-  ["oasis/util","oasis/shims","oasis/config","oasis/globals","oasis/connect","oasis/message_channel","rsvp","oasis/logger"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, __dependency6__, RSVP, Logger) {
+  ["oasis/util","oasis/shims","oasis/config","oasis/connect","oasis/message_channel","rsvp","oasis/logger"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, __dependency5__, RSVP, Logger) {
     "use strict";
     var mustImplement = __dependency1__.mustImplement;
     var addEventListener = __dependency2__.addEventListener;
     var removeEventListener = __dependency2__.removeEventListener;
     var configuration = __dependency3__.configuration;
-    var handlers = __dependency4__.handlers;
-    var connectCapabilities = __dependency5__.connectCapabilities;
-    var PostMessageMessageChannel = __dependency6__.PostMessageMessageChannel;
+    var connectCapabilities = __dependency4__.connectCapabilities;
+    var PostMessageMessageChannel = __dependency5__.PostMessageMessageChannel;
 
 
 
@@ -217,21 +222,18 @@ define("oasis/config",
     __exports__.configure = configure;
   });
 define("oasis/connect",
-  ["oasis/util","oasis/shims","oasis/globals","oasis/message_channel","rsvp","oasis/logger","oasis/state","exports"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, RSVP, Logger, State, __exports__) {
+  ["oasis/util","oasis/shims","oasis/message_channel","rsvp","oasis/logger","exports"],
+  function(__dependency1__, __dependency2__, __dependency3__, RSVP, Logger, __exports__) {
     "use strict";
     var assert = __dependency1__.assert;
     var rsvpErrorHandler = __dependency1__.rsvpErrorHandler;
     var a_forEach = __dependency2__.a_forEach;
-    var handlers = __dependency3__.handlers;
-    var ports = __dependency3__.ports;
-    var PostMessagePort = __dependency4__.PostMessagePort;
+    var PostMessagePort = __dependency3__.PostMessagePort;
 
 
-    var receivedPorts = false;
-
+    // TODO: remove use of `oasis` global
     function registerHandler(capability, options) {
-      var port = ports[capability];
+      var port = oasis.ports[capability];
 
       if (port) {
         Logger.log("Found port, setting up '" + capability + "'");
@@ -244,9 +246,9 @@ define("oasis/connect",
         } else {
           port.start();
         }
-      } else if (!receivedPorts) {
+      } else if (!oasis.receivedPorts) {
         Logger.log("No port found, saving handler for '" + capability + "'");
-        handlers[capability] = options;
+        oasis.handlers[capability] = options;
       } else {
         Logger.log("No port was sent for capability '" + capability + "'");
         options.rejectCapability();
@@ -318,8 +320,10 @@ define("oasis/connect",
     function connectConsumers(consumers) {
       function setupCapability(Consumer, name) {
         return function(port) {
+          // TODO: Change global `oasis` to `this` by
+          // turning this into an Oasis.prototype method.
           var consumer = new Consumer(port);
-          State.consumers[name] = consumer;
+          oasis.consumers[name] = consumer;
           consumer.initialize(port, name);
         };
       }
@@ -370,9 +374,12 @@ define("oasis/connect",
       return defered.promise;
     }
 
+    // TODO: remove use of `oasis` global in this fuction
+    //        we need a reference to the correct `oasis` object,
+    //       possibly by passing it in as an arg.
     function connectCapabilities(capabilities, eventPorts) {
       a_forEach.call(capabilities, function(capability, i) {
-        var handler = handlers[capability],
+        var handler = oasis.handlers[capability],
             port = new PostMessagePort(eventPorts[i]);
 
         if (handler) {
@@ -383,16 +390,16 @@ define("oasis/connect",
           });
         }
 
-        ports[capability] = port;
+        oasis.ports[capability] = port;
       });
 
       // TODO: for each handler w/o capability, reject
 
-      receivedPorts = true;
+      oasis.receivedPorts = true;
     }
 
     function portFor(capability) {
-      var port = ports[capability];
+      var port = this.ports[capability];
       assert(port, "You asked for the port for the '" + capability + "' capability, but the environment did not provide one.");
       return port;
     }
@@ -655,7 +662,7 @@ define("oasis/inline_adapter",
           success: function(data){
             var script = '"use strict";' + data;
 
-            resolve(new Function("Oasis", script));
+            resolve(new Function("oasis", script));
           }, 
           error: function(jqxhr, status, error) {
             jqxhr.then = undefined;
@@ -692,10 +699,9 @@ define("oasis/inline_adapter",
           Logger.log("inline sandbox initialized");
           // invoke the runtime..
 
-         /*global requireModule */
-          var Oasis = requireModule('oasis', sandbox.sessionId);
-          Oasis.sessionId = sandbox.sessionId; // debugging/sanity
-          runtime(Oasis);
+          var oasis = new Oasis();
+          oasis.sessionId = sandbox.sessionId; // debugging/sanity
+          runtime(oasis);
           return sandbox;
         }
 
@@ -1082,8 +1088,8 @@ define("oasis/message_channel",
     __exports__.PostMessagePort = PostMessagePort;
   });
 define("oasis/sandbox",
-  ["oasis/util","oasis/shims","oasis/message_channel","oasis/config","rsvp","oasis/logger","oasis/state","oasis/iframe_adapter"],
-  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, RSVP, Logger, State, iframeAdapter) {
+  ["oasis/util","oasis/shims","oasis/message_channel","oasis/config","rsvp","oasis/logger","oasis/iframe_adapter"],
+  function(__dependency1__, __dependency2__, __dependency3__, __dependency4__, RSVP, Logger, iframeAdapter) {
     "use strict";
     var assert = __dependency1__.assert;
     var rsvpErrorHandler = __dependency1__.rsvpErrorHandler;
@@ -1098,7 +1104,8 @@ define("oasis/sandbox",
       this.wiretaps = [];
 
       // Generic capabilities code
-      var pkg = State.packages[options.url];
+      // TODO: Eliminate use of `oasis` global
+      var pkg = oasis.packages[options.url];
 
       var capabilities = options.capabilities;
       if (!capabilities) {
@@ -1204,7 +1211,7 @@ define("oasis/sandbox",
               // Generic
               service = new service(environmentPort, this);
               service.initialize(environmentPort, capability);
-              State.services.push(service);
+              oasis.services.push(service);
               this.capabilities[capability] = service;
             }
 
@@ -1255,11 +1262,11 @@ define("oasis/sandbox",
 
         this.destroyChannels();
 
-        for( var index=0 ; index<State.services.length ; index++) {
-          State.services[index].destroy();
-          delete State.services[index];
+        for( var index=0 ; index<oasis.services.length ; index++) {
+          oasis.services[index].destroy();
+          delete oasis.services[index];
         }
-        State.services = [];
+        oasis.services = [];
       },
 
       // Oasis internal

@@ -18,7 +18,7 @@ function createSandbox(options) {
 
 module('iframe Sandboxes', {
   setup: function () {
-    oasis.reset();
+    oasis = new Oasis();
   },
   teardown: function () {
     if (sandbox) { sandbox.terminate(); }

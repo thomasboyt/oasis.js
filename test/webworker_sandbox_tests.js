@@ -3,7 +3,7 @@ import webworkerAdapter from "oasis/webworker_adapter";
 
 module('Webworker Sandboxes', {
   setup: function() {
-    oasis.reset();
+    oasis = new Oasis();
   }
 });
 

@@ -7,7 +7,6 @@ var oasis;
 module('Inline Sandboxes', {
   setup: function() {
     oasis = new Oasis();
-    oasis.reset();
   }
 });
 
