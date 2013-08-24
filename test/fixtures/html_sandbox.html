@@ -10,7 +10,7 @@
       user: Oasis.Consumer.extend({
         initialize: function () {
           this.request('title').then(function(title) {
-            Oasis.consumers.assertions.send('gotTitle', title);
+            oasis.consumers.assertions.send('gotTitle', title);
           });
         }
       })

@@ -14,6 +14,7 @@ define("oasis",
 
     function Oasis() {
       initializeSandbox();
+      this.reset();
     }
 
     Oasis.Version = Version;
@@ -74,7 +75,7 @@ define("oasis",
       reset: function () {
         state.reset();
         packages = state.packages;
-        Oasis.consumers = state.consumers;
+        this.consumers = state.consumers;
       },
 
       // TODO: move handlers to constructor

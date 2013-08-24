@@ -161,7 +161,7 @@ commonTests('Events', function (createSandbox) {
     expect(2);
     stop(2);
 
-    Oasis.configure('eventCallback', function (callback) {
+    oasis.configure('eventCallback', function (callback) {
       inWrapper = true;
       callback();
       inWrapper = false;

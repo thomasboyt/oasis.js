@@ -1,4 +1,4 @@
-import { Oasis } from "oasis";
+import Oasis from "oasis";
 import { commonTests } from "test/helpers/suite";
 
 commonTests('Consumer', function (createSandbox, adapter) {

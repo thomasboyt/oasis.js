@@ -11,14 +11,14 @@ function createSandbox(options) {
   if( !options.oasisURL ) {
     options.oasisURL = destinationUrl + '/oasis.js.html';
   }
-  sandbox = Oasis.createSandbox(options);
+  sandbox = oasis.createSandbox(options);
   return sandbox;
 }
 
 
 module('iframe Sandboxes', {
   setup: function () {
-    Oasis.reset();
+    oasis.reset();
   },
   teardown: function () {
     if (sandbox) { sandbox.terminate(); }
@@ -86,7 +86,7 @@ test("returns a sandbox with an iframe element", function() {
 });
 
 test("A sandbox can be loaded from the same domain with `Oasis.config.allowSameOrigin` sets to true", function() {
-  Oasis.config.allowSameOrigin = true;
+  oasis.configure('allowSameOrigin', true);
 
   var sandbox = createSandbox({
     url: "fixtures/index.js",

@@ -7,7 +7,7 @@ var oasis;
 module('Inline Sandboxes', {
   setup: function() {
     oasis = new Oasis();
-    Oasis.reset();
+    oasis.reset();
   }
 });
 
@@ -45,7 +45,7 @@ test("communication", function(){
     }
   });
 
-  var sandbox = Oasis.createSandbox({
+  var sandbox = oasis.createSandbox({
     url: 'fixtures/simple_value.js',
     adapter: InlineAdapter,
     capabilities: ['pong'],
@@ -68,7 +68,7 @@ test("2 sandboxes", function(){
      name: 'pingpong2'
   });
 
-  var sandbox1 = Oasis.createSandbox({
+  var sandbox1 = oasis.createSandbox({
     url: 'fixtures/simple_value.js',
     adapter: InlineAdapter,
     capabilities: ['pong'],
@@ -77,7 +77,7 @@ test("2 sandboxes", function(){
     }
   });
 
-  var sandbox2 = Oasis.createSandbox({
+  var sandbox2 = oasis.createSandbox({
     url: 'fixtures/simple_value_with_args.js',
     adapter: InlineAdapter,
     capabilities: ['pong'],

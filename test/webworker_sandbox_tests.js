@@ -3,13 +3,13 @@ import webworkerAdapter from "oasis/webworker_adapter";
 
 module('Webworker Sandboxes', {
   setup: function() {
-    Oasis.reset();
+    oasis.reset();
   }
 });
 
 test("throws an error if the sandbox type is html", function() {
   raises(function() {
-    Oasis.createSandbox({
+    oasis.createSandbox({
       url: "fixtures/html_sandbox.html",
       type: 'html',
       adapter: webworkerAdapter,

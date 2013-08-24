@@ -1,6 +1,6 @@
 var inWrapper = false;
 
-Oasis.configure('eventCallback', function (callback) {
+oasis.configure('eventCallback', function (callback) {
   inWrapper = true;
   callback();
   inWrapper = false;
