@@ -1,6 +1,7 @@
 module.exports = {
   main: {
     type: "amd",
+    compatFix: true, // remove once RSVP is on the new transpiler
     files: [{
       expand: true,
       cwd: 'lib/',
